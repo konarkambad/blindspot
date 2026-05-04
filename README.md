@@ -1,109 +1,59 @@
-# Blind Spot — Know What Your Data Hides
+# Blind Spot
 
-**Upload any CSV or Excel file. Get a full audit of what it conceals before you draw a single conclusion.**
+**Live demo:** _add your Streamlit Cloud URL here_
 
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Streamlit](https://img.shields.io/badge/built%20with-Streamlit-ff4b4b)
+A small Streamlit app that audits any CSV or Excel file for the kinds of problems that quietly break analyses – things like Simpson's Paradox, survivorship bias, hidden confounders and metric gaming. The idea is simple: most tools tell you what's in your data; this one tries to tell you what's missing or misleading before you draw a conclusion.
 
----
+## What it does
 
-## Why This Exists
+You upload a file. The app then runs through seven small modules in sequence:
 
-Most tools tell you what is *in* your data. Blind Spot tells you what is **missing, misleading, or dangerous** before you model, report, or act on it. The problems that destroy analyses — Simpson's Paradox, survivorship bias, hidden confounders, metric gaming — are invisible to standard profilers. Blind Spot makes them visible.
+- **Profile** – missingness, outliers, type issues, correlations
+- **Simpson's Paradox Scanner** – flags pairs of variables whose correlation flips sign across subgroups
+- **Survivorship Bias Detector** – looks for temporal gaps and outcome imbalance suggesting filtered-out cases
+- **Confounder Detection** – uses partial correlation to surface third-variable effects
+- **Metric Gaming Risk Scorer** – checks for Benford's Law violations, round-number pile-ups and suspicious spikes
+- **Confidence Score** – pulls everything into a single A–F grade with a one-line recommendation
+- **Blind Spot Report** – calls out structural gaps the dataset can't answer regardless of method
 
----
+You can also export a self-contained HTML audit report that opens in any browser or prints to PDF.
 
-## Features
+## Tech
 
-| Module | What it catches |
-|---|---|
-| **Simpson's Paradox Scanner** | Correlations that flip sign when data is split into subgroups |
-| **Survivorship Bias Detector** | Temporal gaps, status skew, and outcome imbalance revealing filtered-out cases |
-| **Confounder Warnings** | Third variables that inflate or fabricate correlations between two others |
-| **Metric Gaming Risk Scorer** | Benford deviation, round-number pile-ups, and spike patterns in numeric columns |
-| **Data Confidence Score** | A single A–F grade synthesising every finding, with a plain-English recommendation |
-| **Blind Spot Report** | Structural gaps the dataset cannot answer regardless of analytical method |
-| **Exportable Audit Report** | Self-contained HTML report, printable to PDF, with all findings and charts |
+- Python, Streamlit
+- Pandas, NumPy, SciPy, Statsmodels, Scikit-learn
+- Plotly for visuals
+- DuckDB for fast in-memory aggregation
 
----
-
-## Quick Start
+## How to run it locally
 
 ```bash
-# 1. Clone
 git clone https://github.com/konarkambad/blindspot.git
 cd blindspot
-
-# 2. Install dependencies
 pip install -r requirements.txt
-
-# 3. Run
 streamlit run app.py
 ```
 
-No API key, no database, no configuration required. Open your browser to `http://localhost:8501` and upload any CSV or Excel file — or click **Try Demo Dataset** to run the full audit instantly on an engineered synthetic dataset.
+That's it – no API key, no database, no setup. Click **Try Demo Dataset** in the sidebar to run the audit on a synthetic dataset that's been engineered to trigger every module.
 
----
+## A note on big files
 
-## How It Works
+The app accepts files up to 200 MB, and locally that works fine on most laptops. The hosted version runs on a free tier with limited memory, so very large or very wide datasets can still crash the browser session even after the recent config bump – there's a hard ceiling on how much data Streamlit can ship to the browser in a single message.
 
-```
-Upload            Profile              Audit                 Report
-──────────────    ─────────────────    ──────────────────    ─────────────────────
-CSV / Excel   →   Missingness,     →   7 bias detectors  →   Confidence score,
-up to 200 MB      type issues,         run in sequence,      per-module findings,
-                  cardinality,         each producing        downloadable HTML
-                  outliers,            structured evidence   audit report
-                  correlations         and risk ratings
-```
+If you want to push the limits or test the app on a heavy dataset, run it locally instead. The same modules work on any size your own machine can handle.
 
----
+## Files
 
-## Sample Output
-
-> Screenshot coming soon — run `streamlit run app.py` and click **Try Demo Dataset** to see a live example with engineered Simpson's Paradox, survivorship bias, and metric gaming signals.
-
----
-
-## Tech Stack
-
-| Layer | Libraries |
-|---|---|
-| Data | Python 3.10+, Pandas, NumPy |
-| Statistics | SciPy, Statsmodels, Scikit-learn |
-| Visualisation | Plotly |
-| Interface | Streamlit |
-
----
-
-## Project Structure
-
-```
-blindspot/
-├── app.py                  # Streamlit entry point — layout, sidebar, tab renderers
-├── requirements.txt
-└── utils/
-    ├── loader.py           # CSV / Excel ingestion, size validation, metadata
-    ├── profiler.py         # Missingness, type issues, outliers, correlation matrix
-    ├── paradox.py          # Simpson's Paradox scanner
-    ├── survivorship.py     # Survivorship bias detector
-    ├── confounders.py      # Partial correlation confounder detection
-    ├── metric_risk.py      # Benford's Law, round-number, spike scorer
-    ├── confidence.py       # Overall A–F confidence score synthesis
-    ├── blind_spots.py      # Structural gap inference from column vocabulary
-    ├── report.py           # Self-contained HTML report generator
-    └── sample_data.py      # Synthetic demo dataset (triggers every module)
-```
-
----
-
-## Contributing
-
-Bug reports, feature requests, and pull requests are welcome — please open an issue first so we can discuss the change. Keep pull requests focused on a single concern and include a brief description of what the change does and why.
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE) for full text.
+- `app.py` – Streamlit entry point: sidebar, layout, tab renderers, audit runner
+- `requirements.txt` – Python dependencies
+- `.streamlit/config.toml` – server settings (upload limit, message size)
+- `utils/loader.py` – CSV / Excel ingestion
+- `utils/profiler.py` – missingness, type issues, outliers, correlations
+- `utils/paradox.py` – Simpson's Paradox scanner
+- `utils/survivorship.py` – survivorship bias detector
+- `utils/confounders.py` – partial correlation confounder detection
+- `utils/metric_risk.py` – Benford / round-number / spike scorer
+- `utils/confidence.py` – overall A–F score synthesis
+- `utils/blind_spots.py` – structural gap inference
+- `utils/report.py` – self-contained HTML report generator
+- `utils/sample_data.py` – synthetic demo dataset

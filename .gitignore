@@ -5,7 +5,8 @@ __pycache__/
 .env
 
 # Streamlit
-.streamlit/
+.streamlit/*
+!.streamlit/config.toml
 
 # Virtual environments
 venv/
